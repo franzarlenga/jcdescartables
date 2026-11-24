@@ -1,0 +1,4 @@
+export type Offer = { offer_id: string; product_id: string; sku: string; variant_name: string; unit_label: string; presentation: 'unit' | 'pack'; units_base: number; price_cents: number; available_qty: number; image_path: string | null };
+export type Group = { id: string; slug: string; title: string; brand: string; family: string; image_path: string | null; category_id?: string | null; category_slug?: string | null; category_name?: string | null; department_id?: string | null; department_slug?: string | null; department_name?: string | null; offers: Offer[] };
+export type CartLine = { offer_id: string; sku: string; title: string; variant_name: string; unit_label: string; qty: number; price_cents: number; available_qty: number };
+export function money(cents: number) { return (cents / 100).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 2 }); }
