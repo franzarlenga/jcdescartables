@@ -1,114 +1,87 @@
-# JC · Tienda pública V3 (separada de JC Gestión)
+# JC Descartables · Tienda V3 + JC Gestión integrado
 
-Esta versión contiene **solamente la tienda pública** y no sustituye JC Gestión V12.
-El acceso administrativo simplificado ha sido excluido de la aplicación pública.
-La administración final se incorporará en el ERP privado, con autenticación y permisos del servidor.
-No existe en esta versión un editor de precios/stock; los datos se preparan en Supabase y
-la interfaz administrativa deberá integrarse con el JC Gestión aprobado.
+**Actualización operativa de JC Gestión (25/11/2026)**. Se incorpora el ERP privado **dentro del mismo proyecto Next.js** que ya usa Vercel, GitHub y Supabase. La home pública V3 y el catálogo no fueron rediseñados ni sustituidos.
 
-La vista previa `preview/JC_Tienda_Home_Completa_V3.html` permite explorar la home y
-el catálogo sin exponer costos de compra ni un panel administrativo. Es una demo local
-y no guarda pedidos reales.
+## Acceso
 
-## Estado
-- Base de 337 SKU y 82 grupos de catálogo, con 7 categorías y 31 subcategorías.
-- Home V3 aprobada, navegación, variantes, carrito.
-- Los cobros y la sincronización real con ERP **no están habilitados**.
-- Falta migrar JC Gestión V12 a una app privada conectada a la misma base Supabase.
-- No usar la tienda en producción con plan Vercel Hobby.
+- **Tienda pública:** `https://jcdescartables.ar/` (o la URL de Vercel mientras se propaga DNS).
+- **ERP privado:** `https://gestion.jcdescartables.ar/` (cuando ese subdominio esté agregado al MISMO proyecto de Vercel), o `https://jcdescartables.vercel.app/gestion` para pruebas.
+- **Costos y precios:** `/gestion/precios` (módulo ya implementado, con edición manual, porcentual y cálculo desde costo).
+- Los clientes pueden visitar la tienda. **Las rutas privadas exigen Supabase Auth y el usuario debe figurar en `public.jc_admin_users`**. La seguridad real está en las políticas RLS y funciones SQL, no en que el subdominio sea difícil de adivinar.
 
-# JC Gestión + Tienda Online · V2 catálogo profesional
+## Qué se incorporó en esta actualización
 
-**Desarrollo entregado, no desplegado.** El proyecto es una base real de Next.js + Supabase; la vista previa HTML es solamente una demostración local. **No hay un checkout habilitado para cobros reales** y ningún artículo se publicará sin stock, precio de venta y autorización.
+- Dashboard privado con saldo de caja registrado, pedidos activos, tareas vencidas e inventario mínimo.
+- Inventario real por SKU, familia y marca; físico, reservado y disponible; conteo físico, alerta de mínimo y fotografía desde celular.
+- Pedidos directos manuales con reserva atómica y stock descontado **únicamente al registrar la entrega** después de verificar el cobro.
+- Ventas manuales de Mercado Libre: referencia única de operación, precio real de venta, comisión, envío y otros cargos; **resta del físico al confirmar**. Diferencia entre neto esperado y dinero efectivamente acreditado. Reversión auditable de una venta ML sin cobros.
+- Cobros parciales/verificados y gastos por concepto. Caja de operaciones registradas; **pagos MP aprobados se muestran aparte, sin asumir que están acreditados netos en la cuenta**.
+- Tareas con tablero de tres etapas (arrastrar en escritorio, opciones de un toque en celular), fechas y agenda; completar una tarea no mueve stock ni registra cobros.
+- Tienda Online administrada desde el ERP: publicación y categorías de grupos, activación por presentación, edición de los textos principales de la home; costos y precios independientes, enlazados por producto/SKU.
+- En móvil: navegación fija Inicio / Finanzas / + / Stock / Más, controles de cantidades `−/número/+`, sin desplazamiento horizontal de la página.
 
-## Archivos principales
+## Instalación sobre el repositorio EXISTENTE `franzarlenga/jcdescartables`
 
-- `preview/JC_Tienda_Catalogo_Profesional_V2.html`: **vista previa interactiva sin instalación**, con 337 SKU y 82 grupos. Permite probar catálogo por rubro → subcategoría → marca, detalle por medida y presentación, cantidad `− / +`, carrito local, administración de precios, stock, fotos y grupos. Los cambios que hagas aquí se guardan solo en el navegador; **no sincronizan con Supabase**. No usarla como fuente final de stock.
-- `app/page.tsx`, `components/store.tsx`, `app/globals.css`: tienda profesional de producción, responsive, con catálogo público únicamente de productos habilitados.
-- `app/admin/page.tsx`: panel protegido con Supabase Auth para inventario, fotografías, precios de bulto/individual, categorías, grupos comerciales, pedidos web y cobros verificados.
-- `supabase/migrations/001_jc_store.sql`: estructura de inventario, pedidos, reservas, cobros, imagen pública y autenticación.
-- `supabase/migrations/002_seed_catalog.sql`: importación de los **337 SKU** y sus costos, con marca operativa **JC** en las 134 referencias sin marca declarada. **No carga stock ni precios de venta.**
-- `supabase/migrations/003_categories_and_full_catalog.sql`: añade **7 rubros**, **31 subcategorías** y **76 grupos comerciales** adicionales a los seis pilotos, dando **82 grupos**. Los nuevos grupos son borradores; se vinculan categorías a todos los productos.
-- `scripts/generate_catalog_v2.py`: regenera la migración V2 desde el catálogo fuente; `data/jc_catalog_preview.json` contiene metadatos del catálogo.
+La carpeta real configurada en Vercel es **`JC_GitHub_Codigo_Inicial`**. **No crear otro repositorio ni cambiar Root Directory.** Reemplazar/añadir en esa carpeta los archivos de este proyecto. La raíz de la app sigue conteniendo `package.json`, `app/`, `components/`, `lib/` y `supabase/`.
 
-## Funcionalidades
+### 1. SQL en Supabase (UNA vez, en orden)
 
-**Tienda pública:** catálogo por rubro, subcategoría y marca; búsqueda por SKU, nombre o medida; orden por precio/nombre; ficha de grupo con variantes independientes y presentaciones bulto/individual; cantidades `− / número / +`; carrito; formulario de compra sin usuario y redirección a Checkout Pro cuando se habilite. Puede mostrar imágenes que se carguen en el ERP. Mantiene costos/proveedores exclusivamente en backend privado.
+Ya estaban preparadas/evaluadas las migraciones **001, 002 y 003**. No repetirlas innecesariamente. Si aún no corriste las siguientes, ejecutar en `Supabase → SQL Editor`:
 
-**JC Gestión:** autenticación real vía Supabase; carga de fotografías por SKU y portada por grupo; conteo físico y equivalencia base; precio separado por unidad o bulto; clasificación y edición de categorías/subcategorías; nombre y categoría de cada grupo; activar/ocultar publicación; pedidos web, cobros y entregas parciales. El stock lo comparte la tienda y las ventas, sin deducción duplicada. El pedido reserva; la entrega física descuenta.
+1. `supabase/migrations/004_home_content.sql`
+2. `supabase/migrations/005_sku_legibles.sql`
+3. `supabase/migrations/006_mp_reconciliation_and_jc_contact.sql`
+4. `supabase/migrations/007_costos_y_precios.sql`
+5. **`supabase/migrations/009_erp_operativo.sql`** — NUEVA, no necesita la migración `008` de CRM (el CRM ampliado quedó fuera del alcance por decisión expresa).
 
-**Estado de publicación:** todos los nuevos grupos están ocultos. La vista pública solo expone ofertas si se cumplen estas condiciones: grupo publicado + SKU activo + presentación habilitada + precio de venta ingresado + stock físico contado y disponible. El resto solo existe en el panel privado. No se inventan precios de venta, fotos, clientes ni existencias.
+`009` crea operaciones, finanzas, ventas ML, tareas, costos históricos de renglones, validaciones de reserva y reversión. No publica nada, no crea existencias y no inventa precios.
 
-## Puesta en marcha — Supabase Free + Vercel Hobby (solo pruebas)
+### 2. Dar de alta al primer usuario privado
 
-1. Crear proyecto de Supabase para **JC**, independiente de FIERRO.
-2. Ejecutar los archivos SQL en **este orden** en Supabase SQL Editor:
-   - `001_jc_store.sql`
-   - `002_seed_catalog.sql`
-   - `003_categories_and_full_catalog.sql`
-   Si la etapa 1 ya estaba instalada, **ejecutar solo `003`**. No duplicar la carga ni alterar los costos históricos.
-3. Supabase Authentication → Users: crear el administrador y autorizar su UUID:
-   ```sql
-   insert into public.jc_admin_users(user_id)
-   values ('UUID_DEL_ADMIN') on conflict do nothing;
-   ```
-4. Duplicar `.env.example` como `.env.local`, completar claves de **JC**, sin compartir `SUPABASE_SERVICE_ROLE_KEY` ni `MP_ACCESS_TOKEN` públicamente. Mantener `CHECKOUT_ENABLED=false`.
-5. Con Node 20+ y conexión a npm, ejecutar:
-   ```bash
-   npm install
-   npm run dev
-   ```
-6. Abrir `http://localhost:3000/admin`, iniciar sesión, cargar **precio de venta, foto y stock** de un artículo real; después entrar a **Publicaciones**, corregir la categoría del grupo y habilitarlo. En `http://localhost:3000` debería verse el producto público.
-7. Configurar las credenciales de prueba de Mercado Pago, URLs y webhook y validar pagos aprobados, pendientes, rechazados, expirados y posteriores a la liberación de stock antes de habilitar compras reales. No operar comercialmente en Vercel Hobby.
-8. Al pasar a Vercel Pro y antes de cobrar clientes reales: verificar límites/monitoreo, RLS, pruebas de concurrencia, protección anti-abuso/rate-limit, política de envíos, términos, privacidad, facturación y backups.
+En Supabase → **Authentication → Users**, crear o invitar a la persona que manejará JC. **No poner contraseñas en el repositorio**. Copiar el UUID de ese usuario y ejecutar en SQL Editor:
 
-## Pruebas ejecutadas en esta entrega
+```sql
+insert into public.jc_admin_users(user_id)
+values ('REEMPLAZAR_CON_UUID_REAL') on conflict(user_id) do nothing;
+```
 
-- **8 pruebas Node**: identidad y cantidad de SKU, categorías, borradores, aislamiento de costos, prevención estructural de doble cobro y stock al entregar.
-- Comprobación sintáctica de los componentes TypeScript/TSX modificados.
-- **Navegador de escritorio (1440×900) y móvil (390×844)** sobre el HTML: rubros, filtrado, variantes, detalle, modo Gestión y edición, sin errores JavaScript.
-- Recorrido de prueba local: **ARR_ROL_1520 → stock → precio bulto/rollo → habilitación de publicación → tienda → carrito**, sin errores.
+Es un UUID de Supabase Auth, no un email. El panel solo acepta cuentas autorizadas.
 
-**Validaciones que faltan**: instalación npm y compilación completa contra dependencias (no disponibles en este entorno), conexión y prueba SQL en un proyecto Supabase, test de Mercado Pago, accesos reales, sincronización de fotos y pagos, y puesta en marcha en Vercel. Ninguna prueba local debe interpretarse como autorización para producir cobros reales.
+### 3. Vercel
 
-## Referencias y límites de esta etapa
+- Conservar **Framework: Next.js** y **Root Directory: `JC_GitHub_Codigo_Inicial`**.
+- Tener `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` en Vercel (son públicas, no confundir con `SUPABASE_SERVICE_ROLE_KEY`).
+- Mantener **`CHECKOUT_ENABLED=false`** hasta completar pruebas con la cuenta Mercado Pago del dueño.
+- Hacer commit al mismo repositorio. Vercel construirá y desplegará automáticamente el nuevo código.
+- Para usar el subdominio privado, agregar **`gestion.jcdescartables.ar` como dominio del mismo proyecto Vercel**; `middleware.ts` reescribe la raíz de ese host a `/gestion`. Requiere que DNS esté propagado.
 
-- `data/ATLAS_Catalogo_Importacion.csv` deriva de la lista de costos JC de fecha **15/11/2026**. El dato de marca JC en 134 productos es **marca operativa**, no una atribución del fabricante; se conserva el proveedor original.
-- **Los 82 grupos son una primera organización comercial automática y editable**, no categorías verificadas de Mercado Libre. Requieren revisión de agrupación en los casos con líneas parecidas.
-- Las integraciones de publicaciones de Mercado Libre, pasarela real, envíos tarifados, ERP V12 completo, facturación y devoluciones quedan pendientes. `JC Gestión` en este proyecto administra el núcleo de tienda y stock, no significa que la antigua V12 ya haya migrado toda su lógica.
-- Instrucciones técnicas de Fase 1 en `docs/README_FASE1_BASE.md` (solo como referencia histórica; prevalecen las cifras y migraciones de este README).
+### 4. Prueba inicial segura
 
+1. Entrar a `/gestion` e iniciar sesión.
+2. Elegir un SKU conocido, contar su stock físico real y cargar una foto.
+3. Ir a `/gestion/precios`, cargar un precio de bulto y otro individual; no se cambia automáticamente el costo histórico.
+4. En Gestión → Tienda Online, habilitar las ofertas y el grupo comercial correspondiente.
+5. Revisar la tienda: solo aparece con **precio, oferta habilitada, grupo publicado y stock disponible**.
+6. Registrar **una venta ML de prueba con referencia ÚNICA**, comisión y envío; comprobar descuento físico y resultado comercial (no se acredita automáticamente Caja).
+7. Registrar un pedido directo con otra referencia: debe reservar stock, no descontarlo físicamente. Verificar un cobro y después registrar entrega; recién ahí reduce el físico.
+8. Probar una cancelación pendiente y verificar liberación de reserva; registrar un gasto y comprobar Finanzas.
 
-## V3 — Inicio comercial enriquecido
+### Estado de validación y límites antes de lanzar ventas reales
 
-Se amplió la home siguiendo una estructura comercial: navegación por rubros, banners, líneas, soluciones por actividad, presentaciones por unidad/bulto, cómo comprar y FAQ. El contenido comercial del hero y banners se edita en **Gestión → Inicio**, con persistencia en `jc_home_content` tras ejecutar `supabase/migrations/004_home_content.sql`. No se copian precios, descuentos, fotos ni condiciones de otras tiendas. La tienda no se pone en producción hasta conectar Supabase, pagos, stock, entregas y confirmar condiciones comerciales.
+- **22 pruebas Node locales superadas** sobre estructura, identidad de los 337 SKU, las 82 agrupaciones, la home pública y los contratos del nuevo ERP. TSX y middleware **analizados sintácticamente sin errores**.
+- **No se ejecutó una compilación Next.js completa en este entorno**: el acceso a `registry.npmjs.org` falló. La compilación real debe comprobarse con los logs de Vercel después del commit.
+- **No se ejecutó la migración 009 ni operaciones transaccionales contra la base real de JC** desde este entorno. Requieren validación en Supabase y pruebas de dos operaciones concurrentes antes de operar públicamente.
+- El **checkout continúa desactivado**, sin credenciales Mercado Pago reales ni pagos habilitados. Probar webhooks, expiración automática de reservas (endpoint `/api/cron/expire` con `CRON_SECRET`), reversión de cobros, reembolsos y conciliación bancaria antes de activarlo.
+- La agenda actual se basa en fechas de tareas; aún falta enlazar las entregas programadas con día/semana/mes y usuarios repartidores. La vista Kanban permite cambios de etapa con controles y drag & drop.
+- El CRM avanzado y la API de Mercado Libre **no están incluidos**, conforme a las decisiones del proyecto.
+- Para uso comercial pasar Vercel Hobby → Pro; para Supabase Free configurar respaldos externos. Validar privacidad, comprobantes, logística, facturación y condiciones legales.
 
-### Diferencia entre Inicio y Catálogo
-La portada muestra una selección breve de hasta nueve grupos comerciales. El botón **Ver catálogo completo**, la navegación por categoría y el buscador permiten explorar todas las referencias sin transformar la home en una lista interminable. En la vista previa, los 337 SKU y 82 grupos son administrables, pero los artículos sin precio/stock publicados no constituyen ofertas reales.
+### Integridad de stock
 
-## Decisiones comerciales JC / 24 noviembre 2026
+- `jc_products` es la fuente única de identidad y costo; `jc_offers` guarda precios de **bulto** e **individual**; `jc_stock` guarda cantidad física en unidad base, `jc_reservations` compromisos. No generar segundo inventario para la tienda.
+- La venta de Mercado Libre se registra **solo manualmente**. Su referencia debe ser única, con cargo, envío y otros importes. Esto evita doble registro por código ML; además las RPC usan UUID de operación para idempotencia.
+- El coste se captura en el renglón nuevo para preservar histórico; pedidos viejos sin costo capturado no se revalúan silenciosamente.
 
-- **Datos de contacto:** Zelada 5561, Villa Luro, CABA; tel. 11 5053-3078. El mail está pendiente. Esta dirección de contacto **no implica** que el retiro esté habilitado.
-- **Proveedor tienda propia confirmado:** Mercado Pago Checkout Pro. Mercado Libre continúa separado y sus ventas se registran **manualmente en el ERP**, con comisiones/envíos. La tienda no requiere cuenta del comprador.
-- **Estado real:** `CHECKOUT_ENABLED=false` y credenciales de prueba, sin cuenta conectada ni cobros habilitados. No compartir tokens por chat.
-- **Historial financiero:** se agregó migración 006 para retener en `jc_mp_payments` el neto informado por MP, medio de pago, cuotas y detalle de cargos cuando MP lo incluya. El bruto ya está en `amount_cents`. **No confundir venta aprobada con dinero acreditado**; la conciliación final requiere verificar movimientos de MP.
-- El código existente de checkout usa **Preferences API**, admitida pero legado. Mercado Pago ahora recomienda **Orders API para nuevas integraciones**; evaluar migración y probar antes de salir a producción.
-- No hay cantidad máxima de cuotas elegida: variable opcional `MP_MAX_INSTALLMENTS` sin valor inicial. Sin inventar promociones de cuotas sin interés.
-- El menor costo de comercialización frente a Mercado Libre puede aumentar el margen, pero depende de las tarifas de MP, logística, publicidad, impuestos, contracargos y financiación.
+### Seguridad
 
-## Actualización 24/11/2026 — Costos + precios tienda por SKU (migración 007)
-
-**Estado:** módulo preparado para el proyecto Next.js/Supabase; todavía NO desplegado ni conectado a una base real. Las migraciones 001–006 deben ejecutarse primero, luego `supabase/migrations/007_costos_y_precios.sql`. El código de la tienda V3 está preservado; este archivo agrega una ruta **privada** `/gestion/precios`, no un acceso público a Gestión, y no reemplaza el ERP V12 pendiente de migración total.
-
-- **Origen de costos:** los 337 SKU del PDF JC del 15/11/2026 ya vienen con `jc_products.purchase_cost_ars`. El costo es **por la presentación original de compra**, no siempre por unidad. Se conserva el valor inicial en `original_purchase_cost_ars`. `jc_products.pack_base_qty` permite consultar costo por unidad de inventario.
-- **Precios públicos:** son independientes, por SKU y por forma de venta. `jc_offers.price_cents` distingue `pack` (bulto cerrado) y `unit` (unidad / rollo); ambos consumen el mismo stock. Se mantienen sin cargar (`NULL`) hasta que el administrador los indique.
-- **Pantalla privada:** iniciar sesión con una cuenta autorizada en `jc_admin_users`, acceder a `/gestion/precios`, filtrar familia/marca/buscar SKU, modificar manualmente costo, precio de bulto y precio individual en una única transacción.
-- **Porcentajes:** seleccionar artículos y aplicar **incremento/rebaja del costo**, **incremento/rebaja del precio de bulto**, **incremento/rebaja del precio individual**. Otra opción explícita **“Desde costo + recargo %”** permite crear precios iniciales basados en el costo y en el factor de la presentación, sin confundir recargo con margen sobre venta. Mostrar vista previa antes de guardar.
-- **Auditoría:** `jc_pricing_operations` y `jc_pricing_changes` guardan usuario, fecha, SKU, presentación, valor anterior, nuevo y observación. Operaciones porcentuales usan UUID idempotente para protegerse de reintentos. Los pedidos ya creados conservan sus precios capturados al momento de la venta.
-- **Publicación:** actualizar un precio **NO** activa el producto, NO cambia las existencias, NO modifica automáticamente otro precio y NO habilita Mercado Pago. La tienda pública consume los nuevos `price_cents` desde `public_storefront` solamente cuando el grupo/oferta está publicado, existe stock y el precio es positivo.
-- **IVA:** el PDF identifica excepciones con IVA; los costos se conservan tal como fueron informados, sin inventar tasas o hacer conversiones fiscales automáticas. Revisar antes de usar recargos.
-- **Modo de pruebas:** se mantiene `MP_TEST_MODE=true` y `CHECKOUT_ENABLED=false` hasta configurar credenciales de prueba de la cuenta del dueño y certificar el circuito. No compartir claves privadas por chat.
-
-### Comprobaciones realizadas
-
-`node --test tests/pricing-catalog.test.mjs` comprueba unicidad y presencia de costos en los 337 registros, la vinculación de columnas y las rutas de cambios. El TSX nuevo fue validado con el analizador sintáctico de TypeScript sin errores. **No se pudo ejecutar npm install ni compilar la app completa** porque el entorno no tiene acceso al registro de npm; no se ha probado la migración contra un PostgreSQL real. Esas pruebas siguen pendientes antes de operar con dinero y stock reales.
+Las variables `SUPABASE_SERVICE_ROLE_KEY`, `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET` y `CRON_SECRET` son exclusivas de servidor. No incluir sus valores en archivos públicos, capturas, el repositorio ni el chat. RLS protege todas las tablas privadas; la vista `public_storefront` solamente expone catálogo habilitado.

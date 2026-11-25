@@ -1,0 +1,19 @@
+JC · Actualizacion del ERP en el proyecto GitHub EXISTENTE
+========================================================
+Repositorio: franzarlenga/jcdescartables
+Carpeta configurada en Vercel: JC_GitHub_Codigo_Inicial
+NO crear repositorio nuevo ni cambiar Root Directory.
+
+1) En la PC, descomprimir este ZIP.
+2) Copiar/reemplazar el contenido de JC_GitHub_Codigo_Inicial dentro de
+   la misma carpeta JC_GitHub_Codigo_Inicial del repositorio GitHub.
+   (No subir el ZIP como archivo, ni anidar otra carpeta adentro.)
+3) Confirmar el commit; Vercel reconstruye la app.
+4) Ejecutar migraciones 004,005,006,007,009 en Supabase SQL Editor, en orden.
+   NO ejecutar 008 CRM. Si alguna ya fue ejecutada, verificar antes de repetir.
+5) Crear usuario en Supabase Authentication > Users y agregar su UUID a jc_admin_users.
+6) Entrar a https://jcdescartables.vercel.app/gestion e iniciar sesion.
+7) Probar UN SKU real antes de abrir otras publicaciones.
+
+Mantener CHECKOUT_ENABLED=false, no habilitar cobros reales todavia.
+README.md incluye detalle de pruebas, seguridad, ventas Mercado Libre y dominio.
