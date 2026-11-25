@@ -1,0 +1,1 @@
+Para activar el logo oficial en tienda y ERP, copiá el PNG ORIGINAL como public/jc-logo.png (sin modificarlo). El favicon se genera usando esa misma ruta desde app/layout.tsx. Si no se agregó la imagen, la cabecera conserva JC en texto y el favicon estará pendiente. No subas la imagen a /supabase ni uses ninguna contraseña.

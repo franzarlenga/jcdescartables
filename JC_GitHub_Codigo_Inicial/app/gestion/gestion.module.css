@@ -10,3 +10,105 @@
 
 .homeEditor{padding:19px 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:end}.homeEditor button{justify-self:start}@media(max-width:700px){.homeEditor{grid-template-columns:1fr}}
 @media(max-width:820px){.chips{flex-wrap:wrap;overflow-x:hidden;max-height:91px;overflow-y:auto}}
+
+/* Ajuste UX · Pedidos: sin carruseles ni listas con scrollbar propio */
+.chips{flex-wrap:wrap;overflow:visible;max-height:none;max-width:100%}
+.saleSelectorHead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 15px;background:#f1f7fa;border:1px solid #dfeaf0;border-radius:10px;min-width:0}
+.saleSelectorHead>div{display:grid;gap:6px;min-width:0;flex:1}
+.saleSelectorHead b{font-size:13px;color:#244356}
+.saleSelectorHead small{font-size:10px;color:#718c9c;line-height:1.6;overflow-wrap:anywhere}
+.saleSelectorHead button{flex:none}
+.saleBrowse{display:grid;gap:12px;border:1px solid #e2ebf0;border-radius:10px;padding:15px;min-width:0;background:#fff}
+.saleBrowse .search{min-width:0}
+.saleStep{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:3px 0 0}
+.saleStep b{font-size:12px;color:#274456}
+.saleStep span{font-size:10px;color:#8399a6;text-align:right}
+.choiceGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:7px;min-width:0}
+.choiceGrid button{border:1px solid #dfe8ee;background:#f7fafc;color:#36566a;padding:11px 10px;min-width:0;text-align:left;border-radius:8px;line-height:1.35;overflow-wrap:anywhere;font-size:11px;font-weight:700;cursor:pointer}
+.choiceGrid button:hover{background:#eaf4f8;border-color:#afcbd8}
+.choiceGrid button.chipActive{color:#fff;background:#23465a;border-color:#23465a}
+.productPicker{max-height:none;overflow:visible;display:grid;min-width:0}
+.pickItem{min-width:0;flex-wrap:wrap;align-items:flex-start;gap:9px 13px}
+.pickItem>div:first-child{min-width:150px}
+.pickItem>div:last-child{min-width:0;flex-wrap:wrap}
+.pickItem button{white-space:nowrap;min-height:34px}
+.loadMore{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;border:1px solid #d6e6ed;background:#f5fafc;border-radius:8px;color:#266c89;font-weight:800;font-size:12px}
+.loadMore span{color:#7e94a1;font-size:10px;font-weight:600}
+.saleSummaryTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:8px;border-top:1px solid #edf1f4}
+.saleSummaryTitle h3{margin:0}
+.saleSummaryTitle span{font-size:11px;color:#7d919e}
+/* El panel conserva su desplazamiento vertical natural, sin barras internas visibles. */
+.drawerBody{scrollbar-width:none;overflow-x:hidden}
+.drawerBody::-webkit-scrollbar{display:none}
+
+/* Calendario funcional: semana, mes y día; sin desplazamientos internos */
+.calendarHeader{min-width:0}
+.calendarHeader>div{display:grid;gap:6px;min-width:0}
+.calendarHeader .secondary{background:#fff;color:#284b5e;border:1px solid #dfe8ee;padding:9px 12px;border-radius:8px;white-space:nowrap}
+.calendarToolbar{padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:15px;border-bottom:1px solid #edf2f5}
+.calendarControls{display:flex;align-items:center;gap:5px;min-width:0}
+.calendarControls button{border:1px solid #dce6eb;background:#fff;color:#38586b;min-width:35px;height:35px;padding:0 9px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:750}
+.calendarControls button:hover,.calendarViewTabs button:hover{background:#eff6f9}
+.calendarTitle{margin:0;font-size:15px;font-weight:800;letter-spacing:-.3px;text-align:center;color:#244353;text-transform:capitalize;overflow-wrap:anywhere;min-width:0}
+.calendarViewTabs{display:flex;align-items:center;gap:4px;background:#f0f5f8;padding:4px;border-radius:9px}
+.calendarViewTabs button{background:transparent;border:0;border-radius:7px;padding:8px 12px;font-size:11px;font-weight:750;color:#5d7889}
+.calendarViewTabs button.calendarViewActive{background:#23465a;color:#fff}
+.calendarBody{padding:18px 20px 6px;min-width:0}
+.calendarWeekdays,.monthGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));min-width:0}
+.calendarWeekdays span{text-align:center;padding:0 2px 11px;color:#8196a5;font-size:11px;font-weight:750}
+.monthGrid{border:1px solid #e3ebf0;border-radius:9px;overflow:hidden}
+.monthDay{min-width:0;min-height:90px;padding:11px 9px;background:#fff;border:0;border-right:1px solid #edf1f4;border-bottom:1px solid #edf1f4;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:7px;color:#3b5769}
+.monthDay:nth-child(7n){border-right:0}
+.monthDay b{font-size:13px}
+.monthDay small{font-size:10px;color:#287e9f;background:#ecf7fc;border-radius:5px;padding:3px 5px;line-height:1.3}
+.monthDay:hover,.weekDayHeading:hover{background:#f0f8fb}
+.monthDay.calendarOutside{background:#fafbfd;color:#b0bec6}
+.monthDay.calendarToday b,.weekDay.calendarToday .weekDayHeading strong{border-radius:6px;background:#23465a;color:#fff;padding:4px 7px}
+.weekGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;min-width:0}
+.weekDay{display:flex;flex-direction:column;min-width:0;background:#fafcfd;border:1px solid #e4edf2;border-radius:10px;overflow:hidden;min-height:198px}
+.weekDay.calendarToday{border-color:#a8ccd9;background:#f5fbfe}
+.weekDayHeading{display:grid;justify-items:start;gap:7px;text-align:left;background:transparent;color:#536e7e;padding:11px 10px 12px;border:0;border-bottom:1px solid #e7eef2;min-width:0}
+.weekDayHeading>span{font-size:10px;text-transform:capitalize}
+.weekDayHeading strong{font-size:16px}
+.weekDayHeading small{font-size:10px;color:#98a8b3}
+.weekDayEvents{display:grid;align-content:start;gap:6px;padding:10px 8px;flex:1;min-width:0}
+.calendarEvent{display:block;border:1px solid #d1e6ee;border-left:3px solid #71bbdd;background:#eaf6fb;border-radius:6px;padding:6px;text-align:left;font-size:10px;line-height:1.4;font-weight:700;color:#2d637f;overflow-wrap:anywhere;min-width:0}
+.calendarEvent.calendarDone{border-color:#dce9e1;border-left-color:#88b59d;background:#f0f6f3;color:#7b9487;text-decoration:line-through}
+.calendarEmpty{font-size:10px;color:#b2bdc5}
+.calendarMore,.addDayTask{border:0;background:transparent;color:#387f9c;text-align:left;padding:5px 8px;font-size:10px;font-weight:800}
+.addDayTask{margin:3px 8px 7px;display:inline-flex;align-items:center;gap:4px}
+.dayAgenda{display:grid;gap:8px;max-width:920px;margin:0 auto 18px;min-width:0}
+.dayAgendaTop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+.dayAgendaTop strong{font-size:13px;text-transform:capitalize}
+.dayEvent{border:1px solid #e4edf2;background:#fafcfe;border-radius:9px;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;min-width:0}
+.dayEvent>div{display:grid;gap:6px;min-width:0}
+.dayEvent b{font-size:12px;overflow-wrap:anywhere}
+.dayEvent small{font-size:11px;color:#8097a6;overflow-wrap:anywhere}
+.dayEvent button{flex:none}
+@media(max-width:1150px){.weekGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.calendarToolbar{grid-template-columns:auto 1fr;gap:10px}.calendarViewTabs{grid-column:1 / -1;justify-self:center}}
+@media(max-width:820px){
+ .chips{max-height:none;overflow:visible}
+ .saleSelectorHead{align-items:stretch;flex-direction:column}
+ .saleSelectorHead button{align-self:flex-start}
+ .saleBrowse{padding:12px}
+ .choiceGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .pickItem{display:grid;gap:10px}
+ .pickItem>div:first-child{min-width:0}
+ .pickItem>div:last-child{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;width:100%}
+ .pickItem button{white-space:normal;padding:10px 7px}
+ .calendarToolbar{padding:14px;grid-template-columns:1fr;justify-items:center}
+ .calendarTitle{grid-row:1;text-align:center}
+ .calendarViewTabs{grid-column:auto;width:100%;justify-content:center}
+ .calendarViewTabs button{flex:1}
+ .calendarBody{padding:12px 10px}
+ .weekGrid{grid-template-columns:1fr;gap:8px}
+ .weekDay{min-height:0;flex-direction:row;align-items:stretch}
+ .weekDayHeading{width:94px;flex:none;border-right:1px solid #e7eef2;border-bottom:0}
+ .weekDayEvents{padding:9px;align-content:center}
+ .weekDay .addDayTask{align-self:center;margin:0 6px 0 0;flex:none}
+ .monthDay{min-height:69px;padding:7px 4px}
+ .monthDay b{font-size:12px}
+ .monthDay small{font-size:9px;padding:2px 3px}
+ .dayEvent{align-items:flex-start;flex-direction:column}
+}
+@media(max-width:370px){.weekDayHeading{width:70px}.weekDay .addDayTask{font-size:0}.weekDay .addDayTask svg{width:17px;height:17px}.calendarViewTabs button{padding:8px 6px}}
